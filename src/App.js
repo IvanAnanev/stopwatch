@@ -15,7 +15,15 @@ const App = () => {
   };
 
   const handleStop = () => {
-    setTimer(timestampNow() - timerStart);
+    if (isOn) {
+      setTimer(timestampNow() - timerStart);
+      setIsOn(false);
+    }
+  };
+
+  const handleReset = () => {
+    setTimerStart(null);
+    setTimer(0);
     setIsOn(false);
   };
 
@@ -32,11 +40,22 @@ const App = () => {
   return (
     <div>
       <TimerPresenter timer={timer} />
-      <button onClick={handleStart} type="button">
+      <button
+        disabled={isOn || timer !== 0}
+        onClick={handleStart}
+        type="button"
+      >
         Start
       </button>
-      <button onClick={handleStop} type="button">
+      <button disabled={!isOn} onClick={handleStop} type="button">
         Stop
+      </button>
+      <button
+        disabled={isOn || timer === 0}
+        onClick={handleReset}
+        type="button"
+      >
+        Reset
       </button>
     </div>
   );
