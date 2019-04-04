@@ -2,10 +2,7 @@ import React from 'react';
 
 export default ({ timer }) => {
   const addZeros = (numStr, length = 2) => {
-    if (numStr.length >= length) {
-      return numStr;
-    }
-    return addZeros(`0${numStr}`, length);
+    return numStr.length >= length ? numStr : addZeros(`0${numStr}`, length);
   };
 
   const timerMinutes = () => {
