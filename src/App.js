@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import TimerPresenter from './components/TimerPresenter';
+import LapsPresenter from './components/LapsPresenter';
 
 const App = () => {
   const [isOn, setIsOn] = useState(false);
@@ -7,10 +8,9 @@ const App = () => {
   const [timer, setTimer] = useState(0);
   const [timerStart, setTimerStart] = useState();
   const [timerPause, setTimerPause] = useState();
+  const [laps, setLaps] = useState([]);
 
-  const timestampNow = () => {
-    return new Date().getTime();
-  };
+  const timestampNow = () => new Date().getTime();
 
   const handleStart = () => {
     setTimerStart(timestampNow());
@@ -40,6 +40,13 @@ const App = () => {
     setTimerStart(null);
     setTimer(0);
     setIsOn(false);
+    setLaps([]);
+  };
+
+  const handleLap = () => {
+    const now = timestampNow();
+    setLaps([...laps, { start: timerStart, end: now }]);
+    setTimerStart(now);
   };
 
   useEffect(() => {
@@ -50,7 +57,7 @@ const App = () => {
     }
 
     return () => clearInterval(interval);
-  }, [isOn]);
+  }, [isOn, laps]);
 
   return (
     <div>
@@ -64,12 +71,16 @@ const App = () => {
       <button disabled={!isPause} onClick={handleContinue} type="button">
         Continue
       </button>
+      <button disabled={!isOn} onClick={handleLap} type="button">
+        Lap
+      </button>
       <button disabled={!isOn} onClick={handleStop} type="button">
         Stop
       </button>
       <button disabled={timer === 0 || isOn || isPause} onClick={handleReset} type="button">
         Reset
       </button>
+      <LapsPresenter laps={laps} />
     </div>
   );
 };
