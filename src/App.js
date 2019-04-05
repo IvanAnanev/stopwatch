@@ -7,6 +7,8 @@ const App = () => {
   const [isPause, setIsPause] = useState(false);
   const [timer, setTimer] = useState(0);
   const [timerStart, setTimerStart] = useState();
+  const [commonTimer, setCommonTimer] = useState(0);
+  const [commonTimerStart, setCommonTimerStart] = useState();
   const [timerPause, setTimerPause] = useState();
   const [laps, setLaps] = useState([]);
 
@@ -31,7 +33,11 @@ const App = () => {
   };
 
   const handleContinue = () => {
-    setTimerStart(ts => ts + (timestampNow() - timerPause));
+    const now = timestampNow();
+    setTimerStart(timerStart + (now - timerPause));
+    if (commonTimerStart) {
+      setCommonTimerStart(commonTimerStart + (now - timerPause));
+    }
     setIsOn(true);
     setIsPause(false);
   };
@@ -41,11 +47,18 @@ const App = () => {
     setTimer(0);
     setIsOn(false);
     setLaps([]);
+    if (commonTimerStart) {
+      setCommonTimerStart(null);
+      setCommonTimer(0);
+    }
   };
 
   const handleLap = () => {
     const now = timestampNow();
     setLaps([...laps, { start: timerStart, end: now }]);
+    if (!commonTimerStart) {
+      setCommonTimerStart(timerStart);
+    }
     setTimerStart(now);
   };
 
@@ -53,7 +66,13 @@ const App = () => {
     let interval;
 
     if (isOn) {
-      interval = setInterval(() => setTimer(timestampNow() - timerStart), 10);
+      interval = setInterval(() => {
+        const now = timestampNow();
+        setTimer(now - timerStart);
+        if (commonTimerStart) {
+          setCommonTimer(now - commonTimerStart);
+        }
+      }, 10);
     }
 
     return () => clearInterval(interval);
@@ -61,7 +80,7 @@ const App = () => {
 
   return (
     <div>
-      <TimerPresenter timer={timer} />
+      <TimerPresenter timer={timer} commonTimer={commonTimer} />
       <button disabled={isOn || timer !== 0} onClick={handleStart} type="button">
         Start
       </button>
@@ -80,7 +99,7 @@ const App = () => {
       <button disabled={timer === 0 || isOn || isPause} onClick={handleReset} type="button">
         Reset
       </button>
-      <LapsPresenter laps={laps} />
+      {laps.length > 0 && <LapsPresenter laps={laps} />}
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import timerHumanizer from '../helpers/timerHumanizer';
+import timerHumanize from '../helpers/timerHumanize';
 
 export default ({ laps }) => {
   return (
@@ -7,7 +7,8 @@ export default ({ laps }) => {
       <h2>Laps:</h2>
       <ol>
         {laps.map((lap, index) => (
-          <Lap lap={lap} id={index} />
+          // eslint-disable-next-line react/no-array-index-key
+          <Lap lap={lap} key={index} />
         ))}
       </ol>
     </div>
@@ -15,6 +16,6 @@ export default ({ laps }) => {
 };
 
 const Lap = ({ lap }) => {
-  const time = timerHumanizer(lap.end - lap.start);
+  const time = timerHumanize(lap.end - lap.start);
   return <li>{time}</li>;
 };
